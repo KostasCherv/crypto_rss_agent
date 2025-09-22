@@ -5,6 +5,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
+from schemas import NewsSummary
 from supabase import ClientOptions, create_client, Client
 
 # Load .env secrets
@@ -22,11 +23,7 @@ DEFAULT_FEEDS = [
 # Initialize Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY, options=ClientOptions(schema="public"))
 
-# 1. Define structured schema
-class NewsSummary(BaseModel):
-    summary: list[str] = Field(..., description="2-4 bullet points about the article")
-    sentiment: str = Field(..., description="One of: Positive, Negative, Neutral")
-    verdict: str = Field(..., description="Forward-looking evaluation, 1–2 sentences")
+# 1. Use structured schema from schemas.py
 
 parser = JsonOutputParser(pydantic_object=NewsSummary)
 
