@@ -84,17 +84,10 @@ def calculate_weekly_sentiment_breakdown(daily_digests):
 def create_weekly_digest(target_date: date = None):
     """Create weekly digest for a specific week (defaults to the week that just finished)"""
     if target_date is None:
-        # Get the week that just finished (go back to find the most recent completed week)
+        # Always find the Monday of the current week, then go back 7 days to get the previous week
         today = datetime.now(timezone.utc).date()
-        # If today is Monday, we want the previous week (7 days ago)
-        # If today is Tuesday-Sunday, we want the week that started on the most recent Monday
-        if today.weekday() == 0:  # Monday
-            target_date = today - timedelta(days=7)
-        else:
-            # Find the Monday of the current week, then go back 7 days to get the previous week
-            days_since_monday = today.weekday()
-            current_week_monday = today - timedelta(days=days_since_monday)
-            target_date = current_week_monday - timedelta(days=7)
+        current_week_monday = today - timedelta(days=today.weekday())
+        target_date = current_week_monday - timedelta(days=7)
     
     week_start = get_week_start_date(target_date)
     week_end = week_start + timedelta(days=6)
