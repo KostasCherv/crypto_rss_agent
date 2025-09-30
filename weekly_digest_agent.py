@@ -82,14 +82,25 @@ def calculate_weekly_sentiment_breakdown(daily_digests):
 
 
 def create_weekly_digest(target_date: date = None):
-    """Create weekly digest for a specific week (defaults to last week)"""
+    """Create weekly digest for a specific week (defaults to the week that just finished)"""
     if target_date is None:
-        target_date = date.today() - timedelta(days=7)
+        # Get the week that just finished (go back to find the most recent completed week)
+        today = date.today()
+        # If today is Monday, we want the previous week (7 days ago)
+        # If today is Tuesday-Sunday, we want the week that started on the most recent Monday
+        if today.weekday() == 0:  # Monday
+            target_date = today - timedelta(days=7)
+        else:
+            # Find the Monday of the current week, then go back 7 days to get the previous week
+            days_since_monday = today.weekday()
+            current_week_monday = today - timedelta(days=days_since_monday)
+            target_date = current_week_monday - timedelta(days=7)
     
     week_start = get_week_start_date(target_date)
     week_end = week_start + timedelta(days=6)
     
     print(f"📅 Creating weekly digest for {week_start} to {week_end}")
+    print(f"🔍 Target date used: {target_date} (today is {date.today()})")
     
     # Check if digest already exists
     existing = supabase.table("weekly_digests").select("id").eq("week_start_date", week_start.isoformat()).eq("week_end_date", week_end.isoformat()).execute()

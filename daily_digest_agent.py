@@ -73,11 +73,14 @@ def calculate_sentiment_breakdown(articles):
 
 
 def create_daily_digest(target_date: date = None):
-    """Create daily digest for a specific date (defaults to yesterday)"""
+    """Create daily digest for a specific date (defaults to yesterday in UTC)"""
     if target_date is None:
-        target_date = date.today() - timedelta(days=1)
+        # Use UTC timezone to get yesterday's date consistently
+        utc_now = datetime.now(timezone.utc)
+        target_date = utc_now.date() - timedelta(days=1)
     
     print(f"📅 Creating daily digest for {target_date}")
+    print(f"🔍 Target date used: {target_date} (UTC today is {datetime.now(timezone.utc).date()})")
     
     # Check if digest already exists
     existing = supabase.table("daily_digests").select("id").eq("digest_date", target_date.isoformat()).execute()
