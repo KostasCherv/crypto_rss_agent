@@ -86,8 +86,9 @@ def create_weekly_digest(target_date: date = None):
     if target_date is None:
         # Always find the Monday of the current week, then go back 7 days to get the previous week
         today = datetime.now(timezone.utc).date()
-        current_week_monday = today - timedelta(days=today.weekday())
-        target_date = current_week_monday - timedelta(days=7)
+        this_week_monday = today - timedelta(days=today.weekday())
+        previous_week_monday = this_week_monday - timedelta(days=7)
+        target_date = previous_week_monday
     
     week_start = get_week_start_date(target_date)
     week_end = week_start + timedelta(days=6)
