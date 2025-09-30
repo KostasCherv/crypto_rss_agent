@@ -41,7 +41,7 @@ llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 def get_week_start_date(target_date: date = None):
     """Get the start of the week (Monday) for a given date"""
     if target_date is None:
-        target_date = date.today()
+        target_date = datetime.now(timezone.utc).date()
     
     # Get Monday of the current week
     days_since_monday = target_date.weekday()
@@ -85,7 +85,7 @@ def create_weekly_digest(target_date: date = None):
     """Create weekly digest for a specific week (defaults to the week that just finished)"""
     if target_date is None:
         # Get the week that just finished (go back to find the most recent completed week)
-        today = date.today()
+        today = datetime.now(timezone.utc).date()
         # If today is Monday, we want the previous week (7 days ago)
         # If today is Tuesday-Sunday, we want the week that started on the most recent Monday
         if today.weekday() == 0:  # Monday
@@ -100,7 +100,7 @@ def create_weekly_digest(target_date: date = None):
     week_end = week_start + timedelta(days=6)
     
     print(f"📅 Creating weekly digest for {week_start} to {week_end}")
-    print(f"🔍 Target date used: {target_date} (today is {date.today()})")
+    print(f"🔍 Target date used: {target_date} (UTC today is {datetime.now(timezone.utc).date()})")
     
     # Check if digest already exists
     existing = supabase.table("weekly_digests").select("id").eq("week_start_date", week_start.isoformat()).eq("week_end_date", week_end.isoformat()).execute()
